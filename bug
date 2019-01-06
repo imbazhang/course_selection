@@ -1,0 +1,27 @@
+# work for freshman - study
+from requests_html import HTMLSession
+import random
+import _thread
+import webbrowser
+
+def getUrl():
+    session = HTMLSession()
+    url = "https://portal1.ecnu.edu.cn/cas/login?service=http%3A%2F%2Fportal.ecnu.edu.cn%2Fneusoftcas.jsp"
+    return session.get(url)
+
+r = getUrl()
+Content = r.content
+Texts = r.html.text
+
+login_text = input("input your text:")
+login_password = input("input your password")
+
+
+'''
+print(Texts)
+
+for i in r.html.text:
+    list_links.append(i)
+for i in list_links:
+    print(i)
+'''
