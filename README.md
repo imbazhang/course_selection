@@ -1,4 +1,3 @@
-# course_selection
 # course_selection_ecnu
 ### Based on package selenium, this is a very simple file to catch all the electable courses on the site.
 ### 这是一个很简单的爬虫，基于selenium自动测试框架，是新生研讨课的一个小作业
