@@ -3,30 +3,42 @@ from selenium.webdriver.support.wait import *
 import os
 import xlwt
 from selenium.webdriver.common.by import By # 导入所有的模块
+import pytesseract
+import time
+from PIL import Image
 
-chromedriver = "C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe"     # 启动chrome需要另外一个Chromedriver程序
+chromedriver = "chromedriver.exe"     #驱动
 option = webdriver.ChromeOptions()
-option.add_argument('--user-data-dir=C:/Users/imbazhang/AppData/Local/Google/Chrome/User Data/Default')       # 导入我本机的chrome设置，没啥用
-os.environ["webdriver.chrome.driver()"] = chromedriver   
+option.add_argument('--user-data-dir=AppData/Local/Google/Chrome/User Data/Default')       # 导入本机的chrome设置
+os.environ["webdriver.chrome.driver()"] = chromedriver
 
 public_database = "https://portal1.ecnu.edu.cn/cas/login?service=http%3A%2F%2Fportal.ecnu.edu.cn%2Fneusoftcas.jsp"
-browser = webdriver.Chrome(chromedriver, chrome_options = option)  # 准备打开网页    启动
+browser = webdriver.Chrome(chromedriver, chrome_options = option)  #
 
 
 
 browser.get(public_database) # 打开数据库登陆页面
 
-browser.find_element_by_id("un").send_keys("10185102120")     # account
-browser.find_element_by_id("pd").send_keys("123456abc")       # password
-os.system("pause") # 人工输入验证码：需要修改
+browser.maximize_window()
+time.sleep(2.0)
+browser.get_screenshot_as_file('screen.png')
+code_img = browser.find_element_by_xpath('//*[@id="codeImage"]')
+browser.find_element_by_id("un").send_keys("account")     # account
+browser.find_element_by_id("pd").send_keys("差点忘了把自己的密码删了还行")  # password
+
+screenshot = Image.open('screen.png')
+code = screenshot.crop((1244, 192, 1317, 225))
+code.save('code.png')
+text = pytesseract.image_to_string(Image.open('code.png'))
+for i in text:
+    if '0'<= i <= '9':
+        browser.find_element_by_id("code").send_keys(i)
+os.system("pause") # 验证码
 
 browser.find_element_by_id("index_login_btn").click()         # action
-os.system("pause")
 
 application_new_jw = "http://applicationnewjw.ecnu.edu.cn/eams"   # 选课
 browser.get(application_new_jw)
-os.system("pause")
-
 
 application_action = "http://applicationnewjw.ecnu.edu.cn/eams/stdElectCourse.action"   # 进入选课
 browser.get(application_action)   # 跳转到选课页面（这里直接分析第二轮选课页面）
@@ -90,7 +102,7 @@ while pageNum < 34:
     browser.find_element_by_class_name("pgNextBtn").click()    # 自动转到下一页
     pageNum += 1
 
-elecatable_class_workbook = xlwt.Workbook()        # 所有页面爬取完成吼创建表格
+elecatable_class_workbook = xlwt.Workbook()        # 所有页面爬取完成后创建表格
 elecatable_class_sheet = elecatable_class_workbook.add_sheet('Elecatable classes')
 
 for i in range(len(Electable_classes)):
@@ -106,60 +118,3 @@ for i in range(len(Electable_classes)):
 
 elecatable_class_workbook.save("Elecatable_Classes.xls")          # 保存
 
-'''
-electableLessonList = browser.find_elements_by_css_selector("electGridTr electGridTr-even")
-lessonList = []
-for lesson in electableLessonList:
-    L = browser.find_elements_by_tag_name("td")
-    print(L)
-    os.system("pause")
-    '''
-
-'''
-class_first = []
-for i in browser.find_elements_by_css_selector("[class='electableCell defaultElected']"):   # 定位每天的第一节课的尝试
-    class_first.append([])
-print(class_first)
-cLass = []
-for i in class_first:
-    unit = i.find_elements_by_tag_name("unit")
-    weekday = i.find_elements_by_tag_name("weekday")
-    cLass.append([unit,weekday,i.text])
-os.system("pause")
-'''
-
-'''
-trlist = browser.find_elements_by_tag_name("tr")   #定位tr 标签的尝试
-tr_text_list = []
-for tr in trlist:
-    if tr.text != "":
-        tr_text_list.append(tr.text.split())
-    print(tr_text_list)
-    tdlist = tr.find_elements_by_tag_name("td")
-    if len(tdlist) > 0:
-        text = tr.find_elements_by_tag_name("td")[0].text
-        print(text)
-        '''
-
-
-'''
-table = []
-table.append(browser.find_element_by_id("electGroupResultsTable"))    # 定位选课结果id的尝试
-print(table)
-'''
-
-'''
-def get_table_content(tableid, queryCpntent):                   # 网上抄的代码
-    arr = []
-    arr1 = []
-    table_loc = (By.ID,tableid)
-    table_tr_list = webdriver.find_element(*table_loc).find_elements(By.TAG_NAME, "tr")
-    for tr in table_tr_list:
-        arr1 = (tr.text).split(" ")
-        print(tr.text)
-        print(arr1)
-        arr.append(arr1)
-
-    print(arr1)
-'''
-# get_table_content("")
